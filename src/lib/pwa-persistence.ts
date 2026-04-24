@@ -77,21 +77,21 @@ export class PWAPersistenceManager {
   }
 
   // 增强的localStorage获取方法
-  getItem(key: string): string | null {
+  async getItem(key: string): Promise<string | null> {
     try {
       // 首先尝试从localStorage获取
       let value = localStorage.getItem(key);
 
       // 如果localStorage为空，尝试从IndexedDB恢复
       if (value === null) {
-        value = this.getFromIndexedDB(key);
+        value = await this.getFromIndexedDB(key);
       }
 
       return value;
     } catch (error) {
       console.error('PWA Persistence: Failed to get data from localStorage:', error);
       // 如果localStorage失败，尝试从IndexedDB获取
-      return this.getFromIndexedDB(key);
+      return await this.getFromIndexedDB(key);
     }
   }
 

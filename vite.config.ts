@@ -62,9 +62,6 @@ export default defineConfig(({mode}) => {
           navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
           // 清理旧缓存
           cleanupOutdatedCaches: true,
-          // 跳过等待 - 立即激活新版本
-          skipWaiting: true,
-          clientsClaim: true,
         },
         includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
         manifest: {

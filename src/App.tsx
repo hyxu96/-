@@ -29,40 +29,44 @@ export default function App() {
 
   // Persistence with PWA support
   useEffect(() => {
-    const savedPet = persistentStorage.getItem('pet');
-    const savedRecords = persistentStorage.getItem('records');
-    const savedTasks = persistentStorage.getItem('tasks');
-    const savedTime = persistentStorage.getItem('reminderTime');
+    const loadData = async () => {
+      const savedPet = await persistentStorage.getItem('pet');
+      const savedRecords = await persistentStorage.getItem('records');
+      const savedTasks = await persistentStorage.getItem('tasks');
+      const savedTime = await persistentStorage.getItem('reminderTime');
 
-    if (savedPet) {
-      try {
-        setPet(JSON.parse(savedPet));
-        setIsFirstTime(false);
-      } catch (error) {
-        console.error('Failed to parse saved pet data:', error);
+      if (savedPet) {
+        try {
+          setPet(JSON.parse(savedPet));
+          setIsFirstTime(false);
+        } catch (error) {
+          console.error('Failed to parse saved pet data:', error);
+        }
       }
-    }
-    if (savedRecords) {
-      try {
-        setRecords(JSON.parse(savedRecords));
-      } catch (error) {
-        console.error('Failed to parse saved records data:', error);
+      if (savedRecords) {
+        try {
+          setRecords(JSON.parse(savedRecords));
+        } catch (error) {
+          console.error('Failed to parse saved records data:', error);
+        }
       }
-    }
-    if (savedTasks) {
-      try {
-        setTasks(JSON.parse(savedTasks));
-      } catch (error) {
-        console.error('Failed to parse saved tasks data:', error);
+      if (savedTasks) {
+        try {
+          setTasks(JSON.parse(savedTasks));
+        } catch (error) {
+          console.error('Failed to parse saved tasks data:', error);
+        }
       }
-    }
-    if (savedTime) {
-      try {
-        setReminderTime(savedTime);
-      } catch (error) {
-        console.error('Failed to parse saved reminder time:', error);
+      if (savedTime) {
+        try {
+          setReminderTime(savedTime);
+        } catch (error) {
+          console.error('Failed to parse saved reminder time:', error);
+        }
       }
-    }
+    };
+
+    loadData();
   }, []);
 
   const handleOnboardingComplete = (newPet: Pet, initialTasks: PeriodicTask[]) => {
