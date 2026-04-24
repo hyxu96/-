@@ -14,6 +14,7 @@ import SettingsView from './components/SettingsView';
 import OnboardingView from './components/OnboardingView';
 import LogHealthOverlay from './components/LogHealthOverlay';
 import { format, subDays, addDays, isSameDay, parseISO } from 'date-fns';
+import { persistentStorage } from './lib/pwa-persistence';
 
 type Tab = 'home' | 'calendar' | 'tasks' | 'settings';
 
@@ -26,28 +27,50 @@ export default function App() {
   const [reminderTime, setReminderTime] = useState<string>('20:00');
   const [isFirstTime, setIsFirstTime] = useState(true);
 
-  // Persistence (Mock)
+  // Persistence with PWA support
   useEffect(() => {
-    const savedPet = localStorage.getItem('pet');
-    const savedRecords = localStorage.getItem('records');
-    const savedTasks = localStorage.getItem('tasks');
-    const savedTime = localStorage.getItem('reminderTime');
+    const savedPet = persistentStorage.getItem('pet');
+    const savedRecords = persistentStorage.getItem('records');
+    const savedTasks = persistentStorage.getItem('tasks');
+    const savedTime = persistentStorage.getItem('reminderTime');
 
     if (savedPet) {
-      setPet(JSON.parse(savedPet));
-      setIsFirstTime(false);
+      try {
+        setPet(JSON.parse(savedPet));
+        setIsFirstTime(false);
+      } catch (error) {
+        console.error('Failed to parse saved pet data:', error);
+      }
     }
-    if (savedRecords) setRecords(JSON.parse(savedRecords));
-    if (savedTasks) setTasks(JSON.parse(savedTasks));
-    if (savedTime) setReminderTime(savedTime);
+    if (savedRecords) {
+      try {
+        setRecords(JSON.parse(savedRecords));
+      } catch (error) {
+        console.error('Failed to parse saved records data:', error);
+      }
+    }
+    if (savedTasks) {
+      try {
+        setTasks(JSON.parse(savedTasks));
+      } catch (error) {
+        console.error('Failed to parse saved tasks data:', error);
+      }
+    }
+    if (savedTime) {
+      try {
+        setReminderTime(savedTime);
+      } catch (error) {
+        console.error('Failed to parse saved reminder time:', error);
+      }
+    }
   }, []);
 
   const handleOnboardingComplete = (newPet: Pet, initialTasks: PeriodicTask[]) => {
     setPet(newPet);
     setTasks(initialTasks);
     setIsFirstTime(false);
-    localStorage.setItem('pet', JSON.stringify(newPet));
-    localStorage.setItem('tasks', JSON.stringify(initialTasks));
+    persistentStorage.setItem('pet', JSON.stringify(newPet));
+    persistentStorage.setItem('tasks', JSON.stringify(initialTasks));
   };
 
   const handleAddRecord = (record: Omit<DailyRecord, 'id' | 'petId'>) => {
@@ -79,7 +102,7 @@ export default function App() {
     }
 
     setRecords(updated);
-    localStorage.setItem('records', JSON.stringify(updated));
+    persistentStorage.setItem('records', JSON.stringify(updated));
 
     // Sync task completion if any tasks were recorded
     const updatedTasks = tasks.map(t => {
@@ -100,7 +123,7 @@ export default function App() {
     });
 
     setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
     setShowLogOverlay(false);
   };
 
@@ -146,7 +169,7 @@ export default function App() {
       reader.onloadend = () => {
         const updatedPet = { ...pet, avatar: reader.result as string };
         setPet(updatedPet);
-        localStorage.setItem('pet', JSON.stringify(updatedPet));
+        persistentStorage.setItem('pet', JSON.stringify(updatedPet));
       };
       reader.readAsDataURL(file);
     }
@@ -250,7 +273,7 @@ export default function App() {
                 reminderTime={reminderTime}
                 setReminderTime={(time) => {
                   setReminderTime(time);
-                  localStorage.setItem('reminderTime', time);
+                  persistentStorage.setItem('reminderTime', time);
                 }}
               />
             </motion.div>

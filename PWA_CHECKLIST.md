@@ -168,3 +168,28 @@ A:
 - [Workbox 文档](https://developers.google.com/web/tools/workbox)
 - [PWA 开发者文档](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 - [Web App Manifest 规范](https://www.w3.org/TR/appmanifest/)
+
+---
+
+## 🔍 数据持久化验证
+
+### 存储状态检查：
+```javascript
+// 在浏览器控制台运行
+import('./src/lib/pwa-persistence.js').then(({ persistentStorage }) => {
+  console.log('存储状态:', persistentStorage.getStorageInfo());
+});
+```
+
+### 数据完整性测试：
+- [ ] **基本持久化**: 添加数据 → 刷新页面 → 数据保持
+- [ ] **离线保存**: 断开网络 → 修改数据 → 数据保存成功
+- [ ] **网络恢复**: 恢复网络 → 待处理数据自动同步
+- [ ] **多标签页同步**: 同时在多个标签页修改数据
+- [ ] **应用更新**: 更新应用版本 → 数据在更新后保持完整
+
+### 运行自动化测试：
+```bash
+chmod +x test-pwa-persistence.sh
+./test-pwa-persistence.sh
+```

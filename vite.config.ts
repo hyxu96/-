@@ -16,7 +16,57 @@ export default defineConfig(({mode}) => {
         workbox: {
           clientsClaim: true,
           skipWaiting: true,
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          // 缓存策略优化
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          // 运行时缓存配置 - 确保localStorage数据持久化
+          runtimeCaching: [
+            {
+              urlPattern: /^https?.*/,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 7, // 7天
+                },
+                cacheKeyWillBeUsed: async ({ request }) => {
+                  return `${request.url}`;
+                },
+              },
+            },
+            // 缓存静态资源
+            {
+              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'images-cache',
+                expiration: {
+                  maxEntries: 200,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30天
+                },
+              },
+            },
+            // 缓存字体文件
+            {
+              urlPattern: /\.(?:woff2?|ttf|eot)$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'fonts-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1年
+                },
+              },
+            },
+          ],
+          // 导航预加载
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+          // 清理旧缓存
+          cleanupOutdatedCaches: true,
+          // 跳过等待 - 立即激活新版本
+          skipWaiting: true,
+          clientsClaim: true,
         },
         includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
         manifest: {
