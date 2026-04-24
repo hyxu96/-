@@ -203,7 +203,7 @@ function HealthItem({ icon, label, value }: { icon: any, label: string, value: s
     }
     if (type === '排便情况') {
       if (v === 'slight_abnormal') return '软便';
-      if (v === 'abnormal') return '异常';
+      if (v === 'abnormal') return '拉稀';
     }
     if (type === '精神活力') {
       if (v === 'slight_abnormal') return '偏静';

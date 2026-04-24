@@ -199,7 +199,7 @@ export default function LogHealthOverlay({ onClose, onSave, recentRecords, today
                   options={[
                     { label: '正常', value: 'normal' },
                     { label: '软便', value: 'slight_abnormal' },
-                    { label: '异常', value: 'abnormal' }
+                    { label: '拉稀', value: 'abnormal' }
                   ]}
                   onChange={v => setData({...data, poop: v as HealthStatus})}
                 />

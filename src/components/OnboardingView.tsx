@@ -41,7 +41,7 @@ export default function OnboardingView({ onComplete }: OnboardingViewProps) {
   const handleNextToConfirmation = () => {
     const tempPetId = 'temp_id';
     const initialTasks: PeriodicTask[] = [
-      createTask('🛁 美容', 14, 3, recentCare.grooming, tempPetId),
+      createTask('🛁 美容', 60, 3, recentCare.grooming, tempPetId),
       createTask('💊 驱虫', 30, 7, recentCare.deworming, tempPetId),
       createTask('🏥 体检', 365, 30, recentCare.checkup, tempPetId),
       createTask('💉 疫苗', 365, 30, 'unknown', tempPetId),

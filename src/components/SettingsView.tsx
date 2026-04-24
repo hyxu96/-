@@ -103,7 +103,6 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
             />
         </button>
         <h2 className="text-3xl font-bold tracking-tight text-brand-brown">{pet.name}</h2>
-        <p className="text-[10px] font-black uppercase tracking-widest opacity-20 mt-1 italic">第 {Math.floor(Math.random() * 100) + 1} 位 MomoPet 守护者 ✨</p>
       </header>
 
       <section className="space-y-4">

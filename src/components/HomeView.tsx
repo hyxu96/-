@@ -9,9 +9,10 @@ interface HomeViewProps {
   records: DailyRecord[];
   tasks: PeriodicTask[];
   onNavigate: (tab: 'home' | 'calendar' | 'tasks' | 'settings') => void;
+  onOpenLog: () => void;
 }
 
-export default function HomeView({ pet, records, tasks, onNavigate }: HomeViewProps) {
+export default function HomeView({ pet, records, tasks, onNavigate, onOpenLog }: HomeViewProps) {
   const todayRecord = records.find(r => isSameDay(parseISO(r.date), new Date()));
   const sortedRecords = [...records].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   
@@ -67,8 +68,8 @@ export default function HomeView({ pet, records, tasks, onNavigate }: HomeViewPr
             <div className="space-y-4">
               <p className="text-3xl font-bold leading-tight">还没记录<br/>今日状态哦</p>
               <button 
-                onClick={() => onNavigate('home')} // This should trigger the overlay via some shared state ideally, but here we just prompt
-                className="px-6 py-2 bg-brand-brown text-white rounded-full text-sm font-bold shadow-soft"
+                onClick={onOpenLog}
+                className="px-6 py-2 bg-brand-brown text-white rounded-full text-sm font-bold shadow-soft active:scale-95 transition-transform"
               >
                 去打卡
               </button>

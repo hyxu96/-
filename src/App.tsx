@@ -34,7 +34,8 @@ export default function App() {
     const savedTime = localStorage.getItem('reminderTime');
 
     if (savedPet) {
-      setPet(JSON.parse(savedPet));
+      const parsedPet = JSON.parse(savedPet);
+      setPet(parsedPet);
       setIsFirstTime(false);
     }
     if (savedRecords) setRecords(JSON.parse(savedRecords));
@@ -211,6 +212,7 @@ export default function App() {
                 records={records} 
                 tasks={tasks} 
                 onNavigate={setActiveTab} 
+                onOpenLog={() => setShowLogOverlay(true)}
               />
             </motion.div>
           )}
