@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Pet, PeriodicTask } from '../types';
-import { Bell, Shield, CircleUser, HelpCircle, ChevronRight, LogOut, Heart, Clock, X } from 'lucide-react';
+import { Bell, Shield, CircleUser, HelpCircle, ChevronRight, LogOut, Heart, Clock, X, Upload, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { addDays } from 'date-fns';
 
@@ -18,10 +18,35 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
   const [showCycleEdit, setShowCycleEdit] = useState(false);
   const [showPetProfile, setShowPetProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  
-  const AVATARS = ['🐶', '🐱', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁', '🐯', '🐮', '🐷', '🦒', '🦓', '🐘', '🦘'];
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mainAvatarInputRef = useRef<HTMLInputElement>(null);
   
   const [editedPet, setEditedPet] = useState(pet);
+
+  const handleMainAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedPet = { ...pet, avatar: reader.result as string };
+        setPet(updatedPet);
+        localStorage.setItem('pet', JSON.stringify(updatedPet));
+        setEditedPet(updatedPet); // Keep sync
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditedPet({ ...editedPet, avatar: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSavePet = () => {
     setPet(editedPet);
@@ -57,13 +82,26 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
   return (
     <div className="space-y-10 pb-20">
       <header className="text-center pt-6">
-        <div className="w-28 h-28 rounded-full shadow-heavy mx-auto mb-6 bg-brand-yellow overflow-hidden p-1 bg-white">
+        <button 
+          onClick={() => mainAvatarInputRef.current?.click()}
+          className="w-28 h-28 rounded-full shadow-heavy mx-auto mb-6 bg-brand-yellow overflow-hidden p-1 bg-white relative group"
+        >
            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white shadow-inner bg-brand-yellow flex items-center justify-center text-5xl">
              {pet.avatar && !pet.avatar.startsWith('http') && pet.avatar.length <= 4 ? pet.avatar : pet.avatar ? (
               <img src={pet.avatar} alt="avatar" className="w-full h-full object-cover" />
             ) : '🐶'}
            </div>
-        </div>
+           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Camera size={24} className="text-white" />
+           </div>
+           <input 
+              type="file" 
+              ref={mainAvatarInputRef} 
+              onChange={handleMainAvatarUpload} 
+              accept="image/*" 
+              className="hidden" 
+            />
+        </button>
         <h2 className="text-3xl font-bold tracking-tight text-brand-brown">{pet.name}</h2>
         <p className="text-[10px] font-black uppercase tracking-widest opacity-20 mt-1 italic">第 {Math.floor(Math.random() * 100) + 1} 位 MomoPet 守护者 ✨</p>
       </header>
@@ -125,29 +163,32 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
               </div>
 
               <div className="space-y-8 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest opacity-30 ml-2">选择头像</label>
-                  <div className="grid grid-cols-4 gap-3">
-                    {AVATARS.map(emoji => (
-                      <button
-                        key={emoji}
-                        onClick={() => setEditedPet({...editedPet, avatar: emoji})}
-                        className={`text-2xl p-2 rounded-2xl transition-all ${editedPet.avatar === emoji ? 'bg-brand-coral scale-110 shadow-soft' : 'bg-white'}`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+                <div className="flex flex-col items-center gap-4">
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative group w-24 h-24 cursor-pointer"
+                  >
+                    <div className="w-24 h-24 bg-white border-2 border-brand-brown rounded-3xl flex items-center justify-center text-5xl shadow-soft overflow-hidden">
+                      {editedPet.avatar && !editedPet.avatar.startsWith('http') && editedPet.avatar.length <= 4 ? (
+                        editedPet.avatar
+                      ) : editedPet.avatar ? (
+                        <img src={editedPet.avatar} alt="avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <Upload size={32} className="text-brand-brown/20" />
+                      )}
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-brand-coral rounded-full border-2 border-brand-brown flex items-center justify-center text-white shadow-soft">
+                      <Camera size={14} />
+                    </div>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleImageUpload} 
+                      accept="image/*" 
+                      className="hidden" 
+                    />
                   </div>
-                  <input 
-                    type="text" 
-                    placeholder="输入自定义Emoji..."
-                    maxLength={2}
-                    className="w-full text-center p-3 rounded-2xl bg-white/50 border border-brand-brown/5 text-sm outline-none mt-2"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val) setEditedPet({...editedPet, avatar: val});
-                    }}
-                  />
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-30">点击上传图片</p>
                 </div>
 
                 <div className="space-y-6">

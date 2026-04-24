@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Home as HomeIcon, Calendar as CalendarIcon, ClipboardList, Settings as SettingsIcon, Plus, Dog } from 'lucide-react';
+import { Home as HomeIcon, Calendar as CalendarIcon, ClipboardList, Settings as SettingsIcon, Plus, Dog, Camera } from 'lucide-react';
 import { Pet, DailyRecord, PeriodicTask } from './types';
 import HomeView from './components/HomeView';
 import CalendarView from './components/CalendarView';
@@ -137,6 +137,21 @@ export default function App() {
     setActiveTab('home');
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && pet) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedPet = { ...pet, avatar: reader.result as string };
+        setPet(updatedPet);
+        localStorage.setItem('pet', JSON.stringify(updatedPet));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (isFirstTime) {
     return <OnboardingView onComplete={handleOnboardingComplete} />;
   }
@@ -146,7 +161,10 @@ export default function App() {
       {/* Header */}
       <header className="px-6 pt-10 pb-6 flex justify-between items-center z-30">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full border-2 border-white shadow-soft overflow-hidden bg-brand-yellow flex items-center justify-center text-2xl">
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="w-14 h-14 rounded-full border-2 border-white shadow-soft overflow-hidden bg-brand-yellow flex items-center justify-center text-2xl relative group"
+          >
             {pet?.avatar && !pet.avatar.startsWith('http') && pet.avatar.length <= 4 ? (
               pet.avatar
             ) : pet?.avatar ? (
@@ -154,7 +172,17 @@ export default function App() {
             ) : (
               <Dog size={24} />
             )}
-          </div>
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Camera size={16} className="text-white" />
+            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+              accept="image/*" 
+              className="hidden" 
+            />
+          </button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-brand-brown">{pet?.name}</h1>
             <p className="text-xs font-medium text-brand-brown/40">已守护 {records.length + 1} 天 ✨</p>

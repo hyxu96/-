@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Dog, ArrowRight, Camera } from 'lucide-react';
+import { Dog, ArrowRight, Camera, Upload } from 'lucide-react';
 import { Pet, PeriodicTask, TaskStatus } from '../types';
 import { addDays, subDays, format, parseISO } from 'date-fns';
 
@@ -10,14 +10,25 @@ interface OnboardingViewProps {
 
 export default function OnboardingView({ onComplete }: OnboardingViewProps) {
   const [step, setStep] = useState(1);
-  const AVATARS = ['🐶', '🐱', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁', '🐯', '🐮', '🐷', '🦒', '🦓', '🐘', '🦘'];
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [petInfo, setPetInfo] = useState<Partial<Pet>>({
     name: '',
     birthDate: '',
     gender: 'unknown',
     weight: 0,
-    avatar: AVATARS[0],
+    avatar: '',
   });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPetInfo({ ...petInfo, avatar: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const [recentCare, setRecentCare] = useState({
     grooming: 'unknown',
@@ -83,42 +94,30 @@ export default function OnboardingView({ onComplete }: OnboardingViewProps) {
               className="space-y-8"
             >
               <div className="text-center space-y-4">
-                <div className="relative group mx-auto w-24 h-24">
-                  <div className="w-24 h-24 bg-white border-2 border-brand-brown rounded-3xl mx-auto flex items-center justify-center text-5xl shadow-soft">
-                    {petInfo.avatar}
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="relative group mx-auto w-24 h-24 cursor-pointer"
+                >
+                  <div className="w-24 h-24 bg-white border-2 border-brand-brown rounded-3xl mx-auto flex items-center justify-center text-5xl shadow-soft overflow-hidden">
+                    {petInfo.avatar ? (
+                      <img src={petInfo.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <Upload size={32} className="text-brand-brown/20" />
+                    )}
                   </div>
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-brand-coral rounded-full border-2 border-brand-brown flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform">
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-brand-coral rounded-full border-2 border-brand-brown flex items-center justify-center text-white shadow-soft">
                     <Camera size={14} />
                   </div>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                    accept="image/*" 
+                    className="hidden" 
+                  />
                 </div>
                 <h1 className="text-3xl font-bold">你好，铲屎官！</h1>
-                <p className="text-brand-brown/60">挑选一个可爱的头像吧</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-4 gap-3 bg-white/40 p-4 rounded-3xl border border-brand-brown/5">
-                  {AVATARS.map(emoji => (
-                    <button
-                      key={emoji}
-                      onClick={() => setPetInfo({...petInfo, avatar: emoji})}
-                      className={`text-3xl p-2 rounded-2xl transition-all ${petInfo.avatar === emoji ? 'bg-brand-coral text-white scale-110 shadow-soft' : 'hover:bg-white'}`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                  <div className="col-span-4 mt-2">
-                    <input 
-                      type="text" 
-                      placeholder="或者输入你喜欢的Emoji..."
-                      maxLength={2}
-                      className="w-full text-center p-2 text-sm bg-transparent border-b border-brand-brown/10 outline-none focus:border-brand-coral transition-colors"
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val) setPetInfo({...petInfo, avatar: val});
-                      }}
-                    />
-                  </div>
-                </div>
+                <p className="text-brand-brown/60">点击上方上传一张它的美照吧</p>
               </div>
 
               <div className="space-y-4">
