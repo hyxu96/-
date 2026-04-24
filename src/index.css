@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Quicksand", "ZCOOL KuaiLe", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Refined Soft Palette */
+  --color-brand-cream: #FDFCF8;
+  --color-brand-cream-dark: #F5F2ED;
+  --color-brand-mint: #E8F5F1;
+  --color-brand-mint-deep: #B5EAD7;
+  --color-brand-coral: #FF8B8B;
+  --color-brand-coral-soft: #FFF0F0;
+  --color-brand-yellow: #FFF4D2;
+  --color-brand-blue: #E3F2FD;
+  --color-brand-brown: #3C2F2F;
+  --color-brand-brown-light: #8D7765;
+  --color-brand-green: #98D8A0;
+
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
+  --radius-5xl: 48px;
+
+  --shadow-soft: 0 10px 30px -10px rgba(60, 47, 47, 0.08);
+  --shadow-heavy: 0 20px 40px -15px rgba(60, 47, 47, 0.12);
+}
+
+@layer base {
+  body {
+    @apply bg-brand-cream text-brand-brown antialiased selection:bg-brand-mint-deep;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20;
+  }
+  .card-shadow {
+    @apply shadow-soft hover:shadow-heavy transition-all duration-300;
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.markdown-body {
+  @apply text-sm leading-relaxed space-y-4;
+}
