@@ -3,7 +3,6 @@ import { Pet, PeriodicTask } from '../types';
 import { Bell, Shield, CircleUser, HelpCircle, ChevronRight, LogOut, Heart, Clock, X, Upload, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { addDays } from 'date-fns';
-import { persistentStorage } from '../lib/pwa-persistence';
 
 interface SettingsViewProps {
   pet: Pet;
@@ -31,7 +30,7 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
       reader.onloadend = () => {
         const updatedPet = { ...pet, avatar: reader.result as string };
         setPet(updatedPet);
-        persistentStorage.setItem('pet', JSON.stringify(updatedPet));
+        localStorage.setItem('pet', JSON.stringify(updatedPet));
         setEditedPet(updatedPet); // Keep sync
       };
       reader.readAsDataURL(file);
@@ -51,7 +50,7 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
 
   const handleSavePet = () => {
     setPet(editedPet);
-    persistentStorage.setItem('pet', JSON.stringify(editedPet));
+    localStorage.setItem('pet', JSON.stringify(editedPet));
     setShowPetProfile(false);
   };
 
@@ -65,7 +64,7 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
       return t;
     });
     setTasks(updatedTasks);
-    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   const updateOffset = (id: string, newOffset: number) => {
@@ -77,7 +76,7 @@ export default function SettingsView({ pet, setPet, onLogout, tasks, setTasks, r
       return t;
     });
     setTasks(updatedTasks);
-    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   return (

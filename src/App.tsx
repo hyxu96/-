@@ -14,7 +14,6 @@ import SettingsView from './components/SettingsView';
 import OnboardingView from './components/OnboardingView';
 import LogHealthOverlay from './components/LogHealthOverlay';
 import { format, subDays, addDays, isSameDay, parseISO } from 'date-fns';
-import { persistentStorage } from './lib/pwa-persistence';
 
 type Tab = 'home' | 'calendar' | 'tasks' | 'settings';
 
@@ -27,54 +26,28 @@ export default function App() {
   const [reminderTime, setReminderTime] = useState<string>('20:00');
   const [isFirstTime, setIsFirstTime] = useState(true);
 
-  // Persistence with PWA support
+  // Persistence (Mock)
   useEffect(() => {
-    const loadData = async () => {
-      const savedPet = await persistentStorage.getItem('pet');
-      const savedRecords = await persistentStorage.getItem('records');
-      const savedTasks = await persistentStorage.getItem('tasks');
-      const savedTime = await persistentStorage.getItem('reminderTime');
+    const savedPet = localStorage.getItem('pet');
+    const savedRecords = localStorage.getItem('records');
+    const savedTasks = localStorage.getItem('tasks');
+    const savedTime = localStorage.getItem('reminderTime');
 
-      if (savedPet) {
-        try {
-          setPet(JSON.parse(savedPet));
-          setIsFirstTime(false);
-        } catch (error) {
-          console.error('Failed to parse saved pet data:', error);
-        }
-      }
-      if (savedRecords) {
-        try {
-          setRecords(JSON.parse(savedRecords));
-        } catch (error) {
-          console.error('Failed to parse saved records data:', error);
-        }
-      }
-      if (savedTasks) {
-        try {
-          setTasks(JSON.parse(savedTasks));
-        } catch (error) {
-          console.error('Failed to parse saved tasks data:', error);
-        }
-      }
-      if (savedTime) {
-        try {
-          setReminderTime(savedTime);
-        } catch (error) {
-          console.error('Failed to parse saved reminder time:', error);
-        }
-      }
-    };
-
-    loadData();
+    if (savedPet) {
+      setPet(JSON.parse(savedPet));
+      setIsFirstTime(false);
+    }
+    if (savedRecords) setRecords(JSON.parse(savedRecords));
+    if (savedTasks) setTasks(JSON.parse(savedTasks));
+    if (savedTime) setReminderTime(savedTime);
   }, []);
 
   const handleOnboardingComplete = (newPet: Pet, initialTasks: PeriodicTask[]) => {
     setPet(newPet);
     setTasks(initialTasks);
     setIsFirstTime(false);
-    persistentStorage.setItem('pet', JSON.stringify(newPet));
-    persistentStorage.setItem('tasks', JSON.stringify(initialTasks));
+    localStorage.setItem('pet', JSON.stringify(newPet));
+    localStorage.setItem('tasks', JSON.stringify(initialTasks));
   };
 
   const handleAddRecord = (record: Omit<DailyRecord, 'id' | 'petId'>) => {
@@ -106,7 +79,7 @@ export default function App() {
     }
 
     setRecords(updated);
-    persistentStorage.setItem('records', JSON.stringify(updated));
+    localStorage.setItem('records', JSON.stringify(updated));
 
     // Sync task completion if any tasks were recorded
     const updatedTasks = tasks.map(t => {
@@ -127,7 +100,7 @@ export default function App() {
     });
 
     setTasks(updatedTasks);
-    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     setShowLogOverlay(false);
   };
 
@@ -173,7 +146,7 @@ export default function App() {
       reader.onloadend = () => {
         const updatedPet = { ...pet, avatar: reader.result as string };
         setPet(updatedPet);
-        persistentStorage.setItem('pet', JSON.stringify(updatedPet));
+        localStorage.setItem('pet', JSON.stringify(updatedPet));
       };
       reader.readAsDataURL(file);
     }
@@ -277,7 +250,7 @@ export default function App() {
                 reminderTime={reminderTime}
                 setReminderTime={(time) => {
                   setReminderTime(time);
-                  persistentStorage.setItem('reminderTime', time);
+                  localStorage.setItem('reminderTime', time);
                 }}
               />
             </motion.div>

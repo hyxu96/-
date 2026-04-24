@@ -3,7 +3,6 @@ import { PeriodicTask, TaskStatus } from '../types';
 import { format, parseISO, differenceInDays, addDays, isSameDay, subDays } from 'date-fns';
 import { Clock, ShieldCheck, Scissors, HeartPulse, Plus, Calendar, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { persistentStorage } from '../lib/pwa-persistence';
 
 interface TasksViewProps {
   tasks: PeriodicTask[];
@@ -33,7 +32,7 @@ export default function TasksView({ tasks, setTasks, onTaskComplete }: TasksView
     };
     const updated = [...tasks, task];
     setTasks(updated);
-    persistentStorage.setItem('tasks', JSON.stringify(updated));
+    localStorage.setItem('tasks', JSON.stringify(updated));
     setShowAddModal(false);
   };
 
@@ -53,7 +52,7 @@ export default function TasksView({ tasks, setTasks, onTaskComplete }: TasksView
       return t;
     });
     setTasks(updatedTasks);
-    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     setBookingTaskId(null);
   };
 
@@ -69,7 +68,7 @@ export default function TasksView({ tasks, setTasks, onTaskComplete }: TasksView
       return t;
     });
     setTasks(updatedTasks);
-    persistentStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   const today = new Date();
