@@ -20,8 +20,9 @@ export default defineConfig(({mode}) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           // 运行时缓存配置 - 确保localStorage数据持久化
           runtimeCaching: [
+            // API 请求缓存
             {
-              urlPattern: /^https?.*/,
+              urlPattern: /^https:\/\/api\./,
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'api-cache',
@@ -29,32 +30,29 @@ export default defineConfig(({mode}) => {
                   maxEntries: 100,
                   maxAgeSeconds: 60 * 60 * 24 * 7, // 7天
                 },
-                cacheKeyWillBeUsed: async ({ request }) => {
-                  return `${request.url}`;
+              },
+            },
+            // 外部资源缓存
+            {
+              urlPattern: /^https:\/\/fonts\./,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'fonts-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1年
                 },
               },
             },
-            // 缓存静态资源
+            // 图片资源缓存
             {
-              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
               handler: 'CacheFirst',
               options: {
                 cacheName: 'images-cache',
                 expiration: {
                   maxEntries: 200,
                   maxAgeSeconds: 60 * 60 * 24 * 30, // 30天
-                },
-              },
-            },
-            // 缓存字体文件
-            {
-              urlPattern: /\.(?:woff2?|ttf|eot)$/,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'fonts-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1年
                 },
               },
             },
